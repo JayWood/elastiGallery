@@ -1,0 +1,9 @@
+/* CSS Document */
+
+.elastislide-wrapper.elastislide-horizontal{margin: 0px 5px 10px 0px;}
+
+.elastislide-wrapper{background-color: #888; background-color: rgba(0,0,0,0.5);}
+
+.elastislide-carousel ul li a img{border: 2px solid transparent;}
+
+.elastislide-wrapper nav span{background-color: #333; background-color: rgba(0,0,0,0.75);}
