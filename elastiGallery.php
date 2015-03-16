@@ -53,7 +53,7 @@ if ( ! function_exists( 'convertImg' ) ) {
 	}
 }
 
-$elastiGal = new elastiGallery( array(
+$elastiGal = array(
 	'min_slides'     => array(
 		'type'        => 'number',
 		'name'        => 'Minimum Slides',
@@ -109,8 +109,6 @@ $elastiGal = new elastiGallery( array(
 		'default'     => 'filter'
 	)
 
-) );
-
-register_uninstall_hook( __FILE__, $elastiGal->uninstall() );
+);
 
 ?>
