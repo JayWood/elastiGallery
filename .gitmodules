@@ -4,3 +4,6 @@
 [submodule "includes/CMB2"]
 	path = includes/CMB2
 	url = https://github.com/WebDevStudios/CMB2.git
+[submodule "includes/CMB2_RGBa"]
+	path = includes/CMB2_RGBa
+	url = git@github.com:JayWood/CMB2_RGBa_Picker.git
