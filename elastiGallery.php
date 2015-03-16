@@ -1,114 +1,173 @@
-<?
-/*
-Plugin Name: elastiGallery
-Plugin URI: http://plugish.com/plugins/elastiGallery
-Description: A plugin desgined to be a replacement for the default WordPress gallery in a responsive fashion.  This provides a slideshow for the [gallery] shortcode and on the attachment pages along with the ability to add extra slides based on the post tags or category.  Based solely off of the elastiSlide jquery plugin by Codrops.
-Author: Jerry Wood
-Version: 1.6
-Author URI: http://plugish.com/
-*/
-
-require_once( dirname( __FILE__ ) . '/inc/elastigallery.class.php' );
+<?php
+/**
+ * Plugin Name: ElastiGallery
+ * Plugin URI:  http://plugish.com
+ * Description: A plugin desgined to be a replacement for the default WordPress gallery in a responsive fashion.  This provides a slideshow for the [gallery] shortcode and on the attachment pages along with the ability to add extra slides based on the post tags or category.
+ * Version:     0.1.0
+ * Author:      Jay Wood
+ * Author URI:  http://plugish.com
+ * Donate link: http://plugish.com
+ * License:     GPLv2+
+ * Text Domain: elastigallery
+ * Domain Path: /languages
+ */
 
 /**
- *    Determines if the post object has a gallery or not.
+ * Copyright (c) 2015 Jay Wood (email : jjwood2004@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2 or, at
+ * your discretion, any later version, as published by the Free
+ * Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-if ( ! function_exists( 'hasgallery' ) ) {
-	function hasgallery( $i ) {
-		return ( strpos( $i->post_content, '[gallery' ) !== false );
+
+/**
+ * Built using grunt-wp-plugin
+ * Copyright (c) 2013 10up, LLC
+ * https://github.com/10up/grunt-wp-plugin
+ */
+
+/**
+ * Autoloads files with classes when needed
+ * @since  0.1.0
+ * @param  string $class_name Name of the class being requested
+ */
+function elastigallery_autoload_classes( $class_name ) {
+	if ( class_exists( $class_name, false ) || false === stripos( $class_name, 'Elastigallery_' ) ) {
+		return;
 	}
+
+	$filename = strtolower( str_ireplace( 'Elastigallery_', '', $class_name ) );
+
+	Elastigallery::include_file( $filename );
 }
-/*
- * @param int $id Image attachment ID
- * @param string $size_name Name of custom image size as added with add_image_size()
- * return bool True if intermediate image exists or was created. False if failed to create.
+spl_autoload_register( 'elastigallery_autoload_classes' );
+
+/**
+ * Main initiation class
  */
-if ( ! function_exists( 'convertImg' ) ) {
-	function convertImg( $id, $size_name ) {
-		require_once( ABSPATH . 'wp-admin/includes/image.php' );
+class Elastigallery {
 
-		$sizes = image_get_intermediate_size( $id, $size_name );
+	const VERSION = '0.1.0';
+	
+	/**
+	 * Sets up our plugin
+	 * @since  0.1.0
+	 */
+	public function __construct() {
+		
+	}
 
-		if ( ! $sizes ) { //if size doesn't exist for given image
-			//echo "new thumb need for id $id<br />";
+	public function hooks() {
 
-			$upload_dir = wp_upload_dir();
-			$image_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], wp_get_attachment_url( $id ) );
-			$new        = wp_generate_attachment_metadata( $id, $image_path );
-			wp_update_attachment_metadata( $id, $new );
+		register_activation_hook( __FILE__, array( $this, '_activate' ) );
+		register_deactivation_hook( __FILE__, array( $this, '_deactivate' ) );
+		add_action( 'init', array( $this, 'init' ) );
+		add_action( 'admin_init', array( $this, 'admin_hooks' ) );
+	}
 
-			if ( image_get_intermediate_size( $id, $size_name ) ) {
-				//echo "new image size created for id $id<br />";
-				return true;
-			} else {
-				//echo "failed to create new image size for id $id<br />";
-				return false;
-			}
+	/**
+	 * Activate the plugin
+	 */
+	function _activate() {
+		// Make sure any rewrite functionality has been loaded
+		flush_rewrite_rules();
+	}
 
-		} else {
-			//echo 'already exists<br />';
-			return true;
+	/**
+	 * Deactivate the plugin
+	 * Uninstall routines should be in uninstall.php
+	 */
+	function _deactivate() {
+
+	}
+
+	/**
+	 * Init hooks
+	 * @since  0.1.0
+	 * @return null
+	 */
+	public function init() {
+		$locale = apply_filters( 'plugin_locale', get_locale(), 'elastigallery' );
+		load_textdomain( 'elastigallery', WP_LANG_DIR . '/elastigallery/elastigallery-' . $locale . '.mo' );
+		load_plugin_textdomain( 'elastigallery', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+	}
+
+	/**
+	 * Hooks for the Admin
+	 * @since  0.1.0
+	 * @return null
+	 */
+	public function admin_hooks() {
+	}
+
+	/**
+	 * Include a file from the includes directory
+	 * @since  0.1.0
+	 * @param  string $filename Name of the file to be included
+	 */
+	public static function include_file( $filename ) {
+		$file = self::dir( 'includes/'. $filename .'.php' );
+		if ( file_exists( $file ) ) {
+			return include_once( $file );
 		}
-
 	}
+
+	/**
+	 * This plugin's directory
+	 * @since  0.1.0
+	 * @param  string $path (optional) appended path
+	 * @return string       Directory and path
+	 */
+	public static function dir( $path = '' ) {
+		static $dir;
+		$dir = $dir ? $dir : trailingslashit( dirname( __FILE__ ) );
+		return $dir . $path;
+	}
+
+	/**
+	 * This plugin's url
+	 * @since  0.1.0
+	 * @param  string $path (optional) appended path
+	 * @return string       URL and path
+	 */
+	public static function url( $path = '' ) {
+		static $url;
+		$url = $url ? $url : trailingslashit( plugin_dir_url( __FILE__ ) );
+		return $url . $path;
+	}
+
+	/**
+	 * Magic getter for our object.
+	 *
+	 * @param string $field
+	 *
+	 * @throws Exception Throws an exception if the field is invalid.
+	 *
+	 * @return mixed
+	 */
+	public function __get( $field ) {
+		switch ( $field ) {
+			case 'url':
+			case 'path':
+				return self::$field;
+			default:
+				throw new Exception( 'Invalid '. __CLASS__ .' property: ' . $field );
+		}
+	}
+
 }
 
-$elastiGal = array(
-	'min_slides'     => array(
-		'type'        => 'number',
-		'name'        => 'Minimum Slides',
-		'description' => 'Ensures that this # of thumbnails is shown at all times.  Will scale accordingly.',
-		'default'     => '3'
-	),
-	/*'number_thumbs'	=> array(
-		'type'	=>	'select',
-		'name'	=>	'Number Thumbnails',
-		'description'	=>	'Show numbers on the thumbnails in either an ascending or decending order. Will compensate for addon thumbnails aswell.',
-		'fields'	=>	array(
-			'none'	=>	'Disable Numbering',
-			'asc'	=>	'Ascending Numbering',
-			'desc'	=>	'Descending Numbering',
-		),
-		'default'	=>	'none'
-	),*/
-	'add_thumb'      => array(
-		'type'        => 'number',
-		'name'        => 'Thumbnail Addon #',
-		'description' => 'How many posts to push at the end.',
-		'default'     => '0'
-	),
-	'a_thumb_method' => array(
-		'type'        => 'select',
-		'name'        => 'Addon Method',
-		'description' => 'Add posts according to primary parent category or tag name.  This does not take into account multiple categories or tags.',
-		'fields'      => array(
-			'tag' => 'Tag',
-			'cat' => 'Category'
-		),
-		'default'     => 'cat'
-	),
-	/*'def_thumb'	=>	array(
-		'type'	=>	'media',
-		'name'	=>	'Default Thumbnail',
-		'description'	=>	'A thumbnail to show if none exist for the additional thumbnails.'
-	),*/
-	'img_size_name'  => array(
-		'type'        => 'text',
-		'name'        => 'Image Size Name',
-		'description' => '<b>(Advanced)</b> The name of the image size defined in your functions.php file for your theme or plugin.  If unsure, leave this be, default \'eg_image\'. <br />Image sizes will not take effect on images uploaded before plugin activation.  I recommend a thumbnail recalculation plugin, just google \'wordpress, recalculate thumbnail sizes\'.',
-		'default'     => 'eg_image'
-	),
-	'inc_method'     => array(
-		'type'        => 'select',
-		'name'        => 'Inclusion Method',
-		'description' => '<b>(Advanced)</b> Method of inclusion for the gallery.  If unsure, leave this one alone.',
-		'fields'      => array(
-			'filter' => 'Filter Based',
-			'action' => 'Action Based'
-		),
-		'default'     => 'filter'
-	)
+// init our class
+$GLOBALS['Elastigallery'] = new Elastigallery();
+$GLOBALS['Elastigallery']->hooks();
 
-);
-
-?>

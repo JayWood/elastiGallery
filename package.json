@@ -1,0 +1,23 @@
+{
+  "name": "elastigallery",
+  "title": "ElastiGallery",
+  "description": "A plugin desgined to be a replacement for the default WordPress gallery in a responsive fashion.  This provides a slideshow for the [gallery] shortcode and on the attachment pages along with the ability to add extra slides based on the post tags or category.",
+  "version": "0.1.0",
+  "homepage": "http://plugish.com",
+  "author": {
+    "name": "Jay Wood",
+    "email": "jjwood2004@gmail.com",
+    "url": "http://plugish.com"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "~0.1.2",
+    "grunt-contrib-uglify": "~0.1.1",
+    "grunt-contrib-cssmin": "~0.6.0",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-watch": "~0.2.0",
+    "grunt-contrib-sass": "~0.2.2"
+  },
+  "keywords": []
+}
