@@ -4,14 +4,6 @@
  */
 
 
-/**
- *    Determines if the post object has a gallery or not.
- */
-if ( ! function_exists( 'hasgallery' ) ) {
-	function hasgallery( $i ) {
-		return ( strpos( $i->post_content, '[gallery' ) !== false );
-	}
-}
 /*
  * @param int $id Image attachment ID
  * @param string $size_name Name of custom image size as added with add_image_size()
