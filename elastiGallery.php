@@ -36,11 +36,11 @@
  * https://github.com/10up/grunt-wp-plugin
  */
 
-if( ! defined( 'CMB2_LOADED' ) ) {
+if ( ! defined( 'CMB2_LOADED' ) ) {
 	include_once 'includes/CMB2/init.php';
 }
 
-if( ! class_exists( 'JW_Fancy_Color' ) ) {
+if ( ! class_exists( 'JW_Fancy_Color' ) ) {
 	require_once 'includes/CMB2_RGBa/jw-cmb2-rgba-colorpicker.php';
 }
 require_once 'includes/admin_options.php';
@@ -48,6 +48,7 @@ require_once 'includes/admin_options.php';
 /**
  * Autoloads files with classes when needed
  * @since  0.1.0
+ *
  * @param  string $class_name Name of the class being requested
  */
 function elastigallery_autoload_classes( $class_name ) {
@@ -59,6 +60,7 @@ function elastigallery_autoload_classes( $class_name ) {
 
 	Elastigallery::include_file( $filename );
 }
+
 //spl_autoload_register( 'elastigallery_autoload_classes' );
 
 /**
@@ -67,7 +69,7 @@ function elastigallery_autoload_classes( $class_name ) {
 class Elastigallery {
 
 	const VERSION = '0.1.0';
-	
+
 	/**
 	 * Sets up our plugin
 	 * @since  0.1.0
@@ -79,14 +81,7 @@ class Elastigallery {
 	public function hooks() {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'setup_scripts' ) );
-//		add_filter( 'post_gallery', array( $this, 'gallery_filter' ), 10, 4 );
-	}
-
-	public function gallery_filter( $output = '', $atts = array(), $content = false, $tag = false ) {
-		$old = $output;
-
-
-
+		add_filter( 'post_gallery', array( $this, 'gallery_filter' ), 10, 4 );
 	}
 
 	/**
@@ -96,7 +91,7 @@ class Elastigallery {
 	 */
 	public function init() {
 		$locale = apply_filters( 'plugin_locale', get_locale(), 'elastigallery' );
-		$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$min    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		load_textdomain( 'elastigallery', WP_LANG_DIR . '/elastigallery/elastigallery-' . $locale . '.mo' );
 		load_plugin_textdomain( 'elastigallery', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
@@ -116,12 +111,47 @@ class Elastigallery {
 	}
 
 	/**
+	 * Gallery Filter
+	 *
+	 * Filters the default WP gallery, duh!
+	 *
+	 * @param string $output
+	 * @param array $atts
+	 * @param bool $content
+	 * @param bool $tag
+	 */
+	public function gallery_filter( $output = '', $atts = array(), $content = false, $tag = false ) {
+
+		if( empty( $atts ) ){
+			return $output;
+		}
+
+		$defaults = array(
+			'orderby' => 'rand',
+		);
+		$atts = wp_parse_args( $atts, $defaults );
+
+		if( ! isset( $atts['ids'] ) || empty( $atts['ids'] ) ){
+			return $output;
+		}
+
+		$num_posts = elastigallery_get_option( 'num_posts' );
+		$before_after = elastigallery_get_option( 'pos' );
+
+		$output = "<div class='elastigallery'>";
+		$output .= "</div>";
+
+		return $output;
+	}
+
+	/**
 	 * Include a file from the includes directory
 	 * @since  0.1.0
+	 *
 	 * @param  string $filename Name of the file to be included
 	 */
 	public static function include_file( $filename ) {
-		$file = self::dir( 'includes/'. $filename .'.php' );
+		$file = self::dir( 'includes/' . $filename . '.php' );
 		if ( file_exists( $file ) ) {
 			return include_once( $file );
 		}
@@ -131,24 +161,30 @@ class Elastigallery {
 	/**
 	 * This plugin's directory
 	 * @since  0.1.0
+	 *
 	 * @param  string $path (optional) appended path
+	 *
 	 * @return string       Directory and path
 	 */
 	public static function dir( $path = '' ) {
 		static $dir;
 		$dir = $dir ? $dir : trailingslashit( dirname( __FILE__ ) );
+
 		return $dir . $path;
 	}
 
 	/**
 	 * This plugin's url
 	 * @since  0.1.0
+	 *
 	 * @param  string $path (optional) appended path
+	 *
 	 * @return string       URL and path
 	 */
 	public static function url( $path = '' ) {
 		static $url;
 		$url = $url ? $url : trailingslashit( plugin_dir_url( __FILE__ ) );
+
 		return $url . $path;
 	}
 
@@ -167,7 +203,7 @@ class Elastigallery {
 			case 'path':
 				return self::$field;
 			default:
-				throw new Exception( 'Invalid '. __CLASS__ .' property: ' . $field );
+				throw new Exception( 'Invalid ' . __CLASS__ . ' property: ' . $field );
 		}
 	}
 

@@ -47,6 +47,19 @@ class ElastiGallery_Admin {
 		add_action( 'admin_init', array( $this, 'init' ) );
 		add_action( 'admin_menu', array( $this, 'add_options_page' ) );
 		add_action( 'cmb2_init', array( $this, 'add_options_page_metabox' ) );
+		
+		add_action( 'cmb2_render_number', array( $this, 'render_number' ), 10, 5 );
+		add_action( 'cmb2_sanitize_number', array( $this, 'sanitize_number' ), 10, 2 );
+	}
+
+	public function render_number( $field, $esc, $obj_id, $obj_type, $fto ) {
+		if( method_exists( $fto, 'input' ) ) {
+			echo $fto->input( array( 'class' => 'cmb2-text-small', 'type' => 'number' ) );
+		}
+	}
+
+	public function sanitize_number( $null, $new ){
+		return preg_replace( '/[^0-9/', '', $new );
 	}
 
 
@@ -98,11 +111,11 @@ class ElastiGallery_Admin {
 		// Set our CMB2 fields
 
 		$cmb->add_field( array(
-			'name' => __( 'Test Text', 'elastigallery' ),
-			'desc' => __( 'field description (optional)', 'elastigallery' ),
-			'id'   => 'test_text',
-			'type' => 'text',
-			'default' => 'Default Text',
+			'name' => __( 'Number of Posts', 'elastigallery' ),
+			'desc' => __( 'The number of posts to tack onto the available gallery images.', 'elastigallery' ),
+			'id'   => 'num_posts',
+			'type' => 'number',
+			'default' => 0,
 		) );
 
 		$cmb->add_field( array(
