@@ -36,6 +36,15 @@
  * https://github.com/10up/grunt-wp-plugin
  */
 
+if( ! defined( 'CMB2_LOADED' ) ) {
+	include_once 'includes/CMB2/init.php';
+}
+
+if( ! class_exists( 'JW_Fancy_Color' ) ) {
+	require_once 'includes/CMB2_RGBa/jw-cmb2-rgba-colorpicker.php';
+}
+require_once 'includes/admin_options.php';
+
 /**
  * Autoloads files with classes when needed
  * @since  0.1.0
@@ -50,7 +59,7 @@ function elastigallery_autoload_classes( $class_name ) {
 
 	Elastigallery::include_file( $filename );
 }
-spl_autoload_register( 'elastigallery_autoload_classes' );
+//spl_autoload_register( 'elastigallery_autoload_classes' );
 
 /**
  * Main initiation class
@@ -63,31 +72,20 @@ class Elastigallery {
 	 * Sets up our plugin
 	 * @since  0.1.0
 	 */
-	public function __construct() {
-		
-	}
+//	public function __construct() {
+//
+//	}
 
 	public function hooks() {
-
-		register_activation_hook( __FILE__, array( $this, '_activate' ) );
-		register_deactivation_hook( __FILE__, array( $this, '_deactivate' ) );
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_hooks' ) );
+//		add_filter( 'post_gallery', array( $this, 'gallery_filter' ), 10, 4 );
 	}
 
-	/**
-	 * Activate the plugin
-	 */
-	function _activate() {
-		// Make sure any rewrite functionality has been loaded
-		flush_rewrite_rules();
-	}
+	public function gallery_filter( $output = '', $atts = array(), $content = false, $tag = false ) {
+		$old = $output;
 
-	/**
-	 * Deactivate the plugin
-	 * Uninstall routines should be in uninstall.php
-	 */
-	function _deactivate() {
+
 
 	}
 
@@ -120,6 +118,7 @@ class Elastigallery {
 		if ( file_exists( $file ) ) {
 			return include_once( $file );
 		}
+
 	}
 
 	/**
