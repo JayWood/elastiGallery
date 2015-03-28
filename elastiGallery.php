@@ -78,7 +78,7 @@ class Elastigallery {
 
 	public function hooks() {
 		add_action( 'init', array( $this, 'init' ) );
-		add_action( 'admin_init', array( $this, 'admin_hooks' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'setup_scripts' ) );
 //		add_filter( 'post_gallery', array( $this, 'gallery_filter' ), 10, 4 );
 	}
 
@@ -96,16 +96,23 @@ class Elastigallery {
 	 */
 	public function init() {
 		$locale = apply_filters( 'plugin_locale', get_locale(), 'elastigallery' );
+		$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 		load_textdomain( 'elastigallery', WP_LANG_DIR . '/elastigallery/elastigallery-' . $locale . '.mo' );
 		load_plugin_textdomain( 'elastigallery', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
+		wp_register_style( 'owlcarousel', $this->url( "assets/js/vendor/OwlCarousel/owl.carousel.css" ), false, self::VERSION );
+		wp_register_style( 'owlcarousel_theme', $this->url( "assets/js/vendor/OwlCarousel/owl.theme.css" ), array( 'owlcarousel' ), self::VERSION );
+		wp_register_style( 'elastigallery', $this->url( "assets/css/elastigallery{$min}.css" ), array( 'owlcarousel_theme' ), self::VERSION );
+
+		wp_register_script( 'owlcarousel_js', $this->url( "assets/js/vendor/OwlCarousel/owl.carousel{$min}.js" ), array( 'jquery' ), self::VERSION, true );
+		wp_register_script( 'elastigallery_js', $this->url( "assets/js/elastigallery{$min}.js" ), array( 'owlcarousel_js' ), self::VERSION, true );
+
 	}
 
-	/**
-	 * Hooks for the Admin
-	 * @since  0.1.0
-	 * @return null
-	 */
-	public function admin_hooks() {
+	public function setup_scripts() {
+		wp_enqueue_style( 'elastigallery' );
+		wp_enqueue_script( 'elastigallery_js' );
 	}
 
 	/**
