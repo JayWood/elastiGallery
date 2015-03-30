@@ -122,26 +122,62 @@ class Elastigallery {
 	 */
 	public function gallery_filter( $output = '', $atts = array(), $content = false, $tag = false ) {
 
-		if( empty( $atts ) ){
+		if ( empty( $atts ) ) {
 			return $output;
 		}
 
 		$defaults = array(
 			'orderby' => 'rand',
 		);
-		$atts = wp_parse_args( $atts, $defaults );
+		$atts     = wp_parse_args( $atts, $defaults );
 
-		if( ! isset( $atts['ids'] ) || empty( $atts['ids'] ) ){
+		if ( ! isset( $atts['ids'] ) || empty( $atts['ids'] ) ) {
 			return $output;
 		}
 
-		$num_posts = elastigallery_get_option( 'num_posts' );
+		$ids          = explode( $atts['ids'] );
 		$before_after = elastigallery_get_option( 'pos' );
 
 		$output = "<div class='elastigallery'>";
+
+		if ( 'before' === $before_after ) {
+			$output .= $this->padded_posts();
+		}
+
+		$output .= $this->attachment_posts( $ids );
+
+		if ( 'before' !== $before_after ) {
+			$output .= $this->padded_posts();
+		}
+
 		$output .= "</div>";
 
-		return $output;
+		return apply_filters( 'elastigallery_render', $ids, $atts );
+	}
+
+	public function padded_posts() {
+		// Padded posts
+		$thumb_size = elastigallery_get_option( 'thumbnail_size' );
+		$query      = array(
+			'post_type'     => 'post',
+			'no_found_rows' => true,
+			'post_status'   => 'publish',
+		);
+		$query      = apply_filters( 'elastigallery_padded_posts_query', $query );
+
+		return '';
+	}
+
+	public function attachment_posts( $ids = array() ) {
+		// Attachment posts
+
+		if ( empty( $ids ) || ! is_array( $ids ) ) {
+			return false;
+		}
+
+		$thumb_size = elastigallery_get_option( 'thumbnail_size' );
+
+		return '';
 	}
 
 	/**
