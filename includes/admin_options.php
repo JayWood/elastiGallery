@@ -25,6 +25,12 @@ class ElastiGallery_Admin {
 	protected $title = '';
 
 	/**
+	 * Menu Title for Options Page
+	 * @var string
+	 */
+	protected $menu_title = '';
+
+	/**
 	 * Options Page hook
 	 * @var string
 	 */
@@ -36,7 +42,8 @@ class ElastiGallery_Admin {
 	 */
 	public function __construct() {
 		// Set our title
-		$this->title = __( 'Site Options', 'elastigallery' );
+		$this->title = __( 'elastiGallery Options', 'elastigallery' );
+		$this->menu_title = __( 'elastiGallery', 'elastigallery' );
 	}
 
 	/**
@@ -76,7 +83,7 @@ class ElastiGallery_Admin {
 	 * @since 0.1.0
 	 */
 	public function add_options_page() {
-		$this->options_page = add_options_page( $this->title, $this->title, 'manage_options', $this->key, array(
+		$this->options_page = add_options_page( $this->title, $this->menu_title, 'manage_options', $this->key, array(
 			$this,
 			'admin_page_display'
 		) );
