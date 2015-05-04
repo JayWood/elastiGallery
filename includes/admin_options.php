@@ -112,7 +112,6 @@ class ElastiGallery_Admin {
 			'id'      => $this->metabox_id,
 			'hookup'  => false,
 			'show_on' => array(
-				// These are important, don't remove
 				'key'   => 'options-page',
 				'value' => array( $this->key, )
 			),
@@ -188,11 +187,11 @@ class ElastiGallery_Admin {
 
 		global $_wp_additional_image_sizes;
 
-		$sizes                        = array();
-		$get_intermediate_image_sizes = get_intermediate_image_sizes();
+		$sizes             = array();
+		$intermediate_size = get_intermediate_image_sizes();
 
 		// Create the full array with sizes and crop info
-		foreach ( $get_intermediate_image_sizes as $_size ) {
+		foreach ( $intermediate_size as $_size ) {
 
 			if ( in_array( $_size, array( 'thumbnail', 'medium', 'large' ) ) ) {
 
