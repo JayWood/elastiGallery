@@ -81,7 +81,7 @@ class Elastigallery {
 	public function hooks() {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'setup_scripts' ) );
-		add_filter( 'post_gallery', array( $this, 'gallery_filter' ), 10, 4 );
+		add_filter( 'post_gallery', array( $this, 'gallery_filter' ) );
 	}
 
 	/**
@@ -120,11 +120,10 @@ class Elastigallery {
 	 * @param bool $content
 	 * @param bool $tag
 	 */
-	public function gallery_filter( $output = '', $atts = array(), $content = false, $tag = false ) {
+	public function gallery_filter( $output = '' ) {
+		$post = get_post();
 
-		if ( empty( $atts ) ) {
-			return $output;
-		}
+		//@TODO: Match code in core gallery filter
 
 		$defaults = array(
 			'orderby' => 'rand',

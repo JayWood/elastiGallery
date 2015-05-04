@@ -161,7 +161,6 @@ class ElastiGallery_Admin {
 
 	public function image_sizes() {
 		$sizes = $this->get_image_sizes();
-		error_log( print_r( $sizes, 1 ) );
 		$tmparr = array();
 		if ( empty( $sizes ) ) {
 			return $tmparr;
