@@ -115,20 +115,29 @@ class Elastigallery {
 	 *
 	 * Filters the default WP gallery, duh!
 	 *
+	 * @param string $output HTML output
+	 * @params array $atts Shortcode attributes.
+	 *
 	 * @param string $output
-	 * @param array $atts
-	 * @param bool $content
-	 * @param bool $tag
 	 */
-	public function gallery_filter( $output = '' ) {
+	public function gallery_filter( $output = '', $attr = array() ) {
 		$post = get_post();
+		$post_id = isset( $post->ID ) ? $post->ID : 0;
+
+		if ( isset( $attr['ids'] ) ) {
+			if ( empty( $attr['orderby'] ) ) {
+				$attr['orderby'] = 'post__in';
+			}
+			$attr['include'] = $attr['ids'];
+		}
 
 		//@TODO: Match code in core gallery filter
+		// @see /wp-includes/media.php
 
 		$defaults = array(
 			'orderby' => 'rand',
 		);
-		$atts     = wp_parse_args( $atts, $defaults );
+		$atts     = wp_parse_args( $attr, $defaults );
 
 		if ( ! isset( $atts['ids'] ) || empty( $atts['ids'] ) ) {
 			return $output;
