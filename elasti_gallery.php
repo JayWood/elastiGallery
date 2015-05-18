@@ -113,16 +113,21 @@ class Elastigallery {
 	/**
 	 * Gallery Filter
 	 *
-	 * Filters the default WP gallery, duh!
+	 * Filters the default WP gallery, duh!  Bulk of this is copied
+	 * directly from the media library file.  No need to reinvent the
+	 * wheel? Right!?
 	 *
 	 * @param string $output HTML output
-	 * @params array $atts Shortcode attributes.
+	 * @params array $attr Short code attributes.
 	 *
 	 * @param string $output
 	 */
 	public function gallery_filter( $output = '', $attr = array() ) {
 		$post = get_post();
-		$post_id = isset( $post->ID ) ? $post->ID : 0;
+		$id = isset( $post->ID ) ? $post->ID : 0;
+
+		static $instance = 0;
+		$instance++;
 
 		if ( isset( $attr['ids'] ) ) {
 			if ( empty( $attr['orderby'] ) ) {
@@ -131,28 +136,56 @@ class Elastigallery {
 			$attr['include'] = $attr['ids'];
 		}
 
-		//@TODO: Match code in core gallery filter
-		// @see /wp-includes/media.php
+		$atts = shortcode_atts( array(
+			'order'      => 'ASC',
+			'orderby'    => 'menu_order ID',
+			'id'         => $post ? $post->ID : 0,
+//			'itemtag'    => $html5 ? 'figure'     : 'dl',
+//			'icontag'    => $html5 ? 'div'        : 'dt',
+//			'captiontag' => $html5 ? 'figcaption' : 'dd',
+//			'columns'    => 3,
+			'size'       => 'thumbnail',
+			'include'    => '',
+			'exclude'    => '',
+			'link'       => ''
+		), $attr, 'gallery' );
 
-		$defaults = array(
-			'orderby' => 'rand',
-		);
-		$atts     = wp_parse_args( $attr, $defaults );
+		$before_after = elastigallery_get_option( 'pos' );
 
-		if ( ! isset( $atts['ids'] ) || empty( $atts['ids'] ) ) {
+		if ( ! empty( $atts['include'] ) ) {
+			$_attachments = get_posts( array( 'include' => $atts['include'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
+
+			$attachments = array();
+			foreach ( $_attachments as $key => $val ) {
+				$attachments[$val->ID] = $_attachments[$key];
+			}
+		} elseif ( ! empty( $atts['exclude'] ) ) {
+			$attachments = get_children( array( 'post_parent' => $id, 'exclude' => $atts['exclude'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
+		} else {
+			$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
+		}
+
+		if ( empty( $attachments ) ) {
+			return '';
+		}
+
+		if ( is_feed() ) {
+			$output = "\n";
+			foreach ( $attachments as $att_id => $attachment ) {
+				$output .= wp_get_attachment_link( $att_id, $atts['size'], true ) . "\n";
+			}
 			return $output;
 		}
 
-		$ids          = explode( $atts['ids'] );
-		$before_after = elastigallery_get_option( 'pos' );
+		$selector = "elastigallery-$instance";
 
-		$output = "<div class='elastigallery'>";
+		$output = "<div id='$selector' class='elastigallery galleryid-{$id}'>";
 
 		if ( 'before' === $before_after ) {
 			$output .= $this->padded_posts();
 		}
 
-		$output .= $this->attachment_posts( $ids );
+		$output .= $this->attachment_posts( $attachments, $atts );
 
 		if ( 'before' !== $before_after ) {
 			$output .= $this->padded_posts();
@@ -160,7 +193,7 @@ class Elastigallery {
 
 		$output .= "</div>";
 
-		return apply_filters( 'elastigallery_render', $ids, $atts );
+		return apply_filters( 'elastigallery_render', $output, $attachments, $atts );
 	}
 
 	public function padded_posts() {
@@ -176,14 +209,35 @@ class Elastigallery {
 		return '';
 	}
 
-	public function attachment_posts( $ids = array() ) {
+	public function attachment_posts( $attachments = false, $atts = array() ) {
 		// Attachment posts
 
-		if ( empty( $ids ) || ! is_array( $ids ) ) {
+		if ( empty( $attachments ) || ! is_array( $attachments ) ) {
 			return false;
 		}
 
+		$output = '';
 		$thumb_size = elastigallery_get_option( 'thumbnail_size' );
+		foreach ( $attachments as $id => $attachment ) {
+			if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
+				$image_output = wp_get_attachment_link( $id, $thumb_size, false, false, false, $attr );
+			} elseif ( ! empty( $atts['link'] ) && 'none' === $atts['link'] ) {
+				$image_output = wp_get_attachment_image( $id, $thumb_size, false, $attr );
+			} else {
+				$image_output = wp_get_attachment_link( $id, $thumb_size, true, false, false, $attr );
+			}
+			$image_meta  = wp_get_attachment_metadata( $id );
+			$orientation = '';
+			if ( isset( $image_meta['height'], $image_meta['width'] ) ) {
+				$orientation = ( $image_meta['height'] > $image_meta['width'] ) ? 'portrait' : 'landscape';
+			}
+			$output .= "<div class='gallery-item'>";
+			$output .= "
+			<div class='gallery-icon {$orientation}'>
+				$image_output
+			</div>";
+			$output .= "</div>";
+		}
 
 		return '';
 	}
