@@ -81,7 +81,7 @@ class Elastigallery {
 	public function hooks() {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'setup_scripts' ) );
-		add_filter( 'post_gallery', array( $this, 'gallery_filter' ) );
+		add_filter( 'post_gallery', array( $this, 'gallery_filter' ), 10, 2 );
 	}
 
 	/**
@@ -152,7 +152,10 @@ class Elastigallery {
 
 		$before_after = elastigallery_get_option( 'pos' );
 
+
+
 		if ( ! empty( $atts['include'] ) ) {
+			error_log( __LINE__ . " :: " . __METHOD__ );
 			$_attachments = get_posts( array( 'include' => $atts['include'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
 
 			$attachments = array();
@@ -160,13 +163,16 @@ class Elastigallery {
 				$attachments[$val->ID] = $_attachments[$key];
 			}
 		} elseif ( ! empty( $atts['exclude'] ) ) {
+			error_log( __LINE__ . " :: " . __METHOD__ );
 			$attachments = get_children( array( 'post_parent' => $id, 'exclude' => $atts['exclude'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
 		} else {
+			error_log( __LINE__ . " :: " . __METHOD__ );
 			$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
 		}
 
 		if ( empty( $attachments ) ) {
-			return '';
+			error_log( 'Empty' );
+			return $output;
 		}
 
 		if ( is_feed() ) {
@@ -220,11 +226,11 @@ class Elastigallery {
 		$thumb_size = elastigallery_get_option( 'thumbnail_size' );
 		foreach ( $attachments as $id => $attachment ) {
 			if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
-				$image_output = wp_get_attachment_link( $id, $thumb_size, false, false, false, $attr );
+				$image_output = wp_get_attachment_link( $id, $thumb_size, false, false, false );
 			} elseif ( ! empty( $atts['link'] ) && 'none' === $atts['link'] ) {
-				$image_output = wp_get_attachment_image( $id, $thumb_size, false, $attr );
+				$image_output = wp_get_attachment_image( $id, $thumb_size, false );
 			} else {
-				$image_output = wp_get_attachment_link( $id, $thumb_size, true, false, false, $attr );
+				$image_output = wp_get_attachment_link( $id, $thumb_size, true, false, false );
 			}
 			$image_meta  = wp_get_attachment_metadata( $id );
 			$orientation = '';
@@ -239,7 +245,7 @@ class Elastigallery {
 			$output .= "</div>";
 		}
 
-		return '';
+		return $output;
 	}
 
 	/**
