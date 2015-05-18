@@ -5,4 +5,15 @@
  * Copyright (c) 2015 Jay Wood
  * Licensed under the GPLv2+ license.
  */
-.x{display:none;}
+
+.elastigallery{
+	.gallery-item{
+		height: auto;
+		max-width: 100%;
+		overflow: hidden;
+
+		img{
+			height: auto;
+		}
+	}
+}

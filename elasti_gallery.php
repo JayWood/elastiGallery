@@ -74,9 +74,10 @@ class Elastigallery {
 	 * Sets up our plugin
 	 * @since  0.1.0
 	 */
-//	public function __construct() {
-//
-//	}
+	public function __construct() {
+		// Similar to default thumbnail, but with cropping.
+		add_image_size( 'elsatigallery-thumbnail', 150, 150, array( 'top', 'center' ) );
+	}
 
 	public function hooks() {
 		add_action( 'init', array( $this, 'init' ) );
