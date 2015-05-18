@@ -141,11 +141,11 @@ class ElastiGallery_Admin {
 
 		$cmb->add_Field( array(
 			'name'    => __( 'Thumb Size', 'elastigallery' ),
-			'desc'    => __( 'Select the image size you want to use for the thumbnail', 'elastigallery' ),
+			'desc'    => __( 'Select the image size you want to use for the thumbnail.  <br /><strong>Warning:</strong> Using anything other than elastigallery may produce unexpected results.', 'elastigallery' ),
 			'id'      => 'thumbnail_size',
 			'type'    => 'select',
 			'options' => $this->image_sizes(),
-			'default' => 'thumbnail',
+			'default' => 'elsatigallery-thumbnail',
 		) );
 
 
