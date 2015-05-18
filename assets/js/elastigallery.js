@@ -1,5 +1,5 @@
 /**
- * ElastiGallery - v0.1.0 - 2015-03-28
+ * ElastiGallery - v0.1.0 - 2015-05-18
  * http://plugish.com
  *
  * Copyright (c) 2015;
@@ -14,7 +14,10 @@ window.Elastigallery = (function(window, document, $, undefined){
 	var app = {};
 
 	app.init = function() {
-
+        $( '.elastigallery' ).owlCarousel({
+            items: 4,
+            navigation: false,
+        });
 	};
 
 	$(document).ready( app.init );

@@ -185,7 +185,7 @@ class Elastigallery {
 
 		$selector = "elastigallery-$instance";
 
-		$output = "<div id='$selector' class='elastigallery galleryid-{$id}'>";
+		$output = "<div id='$selector' class='elastigallery galleryid-{$id}' style='display: none;'>";
 
 		if ( 'before' === $before_after ) {
 			$output .= $this->padded_posts();
@@ -226,10 +226,13 @@ class Elastigallery {
 		$thumb_size = elastigallery_get_option( 'thumbnail_size' );
 		foreach ( $attachments as $id => $attachment ) {
 			if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
+				error_log( __LINE__ );
 				$image_output = wp_get_attachment_link( $id, $thumb_size, false, false, false );
 			} elseif ( ! empty( $atts['link'] ) && 'none' === $atts['link'] ) {
+				error_log( __LINE__ );
 				$image_output = wp_get_attachment_image( $id, $thumb_size, false );
 			} else {
+				error_log( __LINE__ );
 				$image_output = wp_get_attachment_link( $id, $thumb_size, true, false, false );
 			}
 			$image_meta  = wp_get_attachment_metadata( $id );

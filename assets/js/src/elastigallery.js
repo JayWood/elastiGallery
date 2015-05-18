@@ -15,7 +15,10 @@ window.Elastigallery = (function(window, document, $, undefined){
 	var app = {};
 
 	app.init = function() {
-
+        $( '.elastigallery' ).owlCarousel({
+            items: 4,
+            navigation: false,
+        });
 	};
 
 	$(document).ready( app.init );
