@@ -83,6 +83,8 @@ class Elastigallery {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'setup_scripts' ) );
 		add_filter( 'post_gallery', array( $this, 'gallery_filter' ), 10, 2 );
+
+		add_action( 'print_media_templates', array( $this, 'gallery_settings' ) );
 	}
 
 	/**
@@ -124,6 +126,12 @@ class Elastigallery {
 	 * @param string $output
 	 */
 	public function gallery_filter( $output = '', $attr = array() ) {
+
+		// Prevent non-elastigallery overrides
+		if ( ! isset( $attr['elastigallery'] ) ) {
+			return $output;
+		}
+
 		$post = get_post();
 		$id = isset( $post->ID ) ? $post->ID : 0;
 
@@ -156,23 +164,18 @@ class Elastigallery {
 
 
 		if ( ! empty( $atts['include'] ) ) {
-			error_log( __LINE__ . " :: " . __METHOD__ );
 			$_attachments = get_posts( array( 'include' => $atts['include'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
-
 			$attachments = array();
 			foreach ( $_attachments as $key => $val ) {
 				$attachments[$val->ID] = $_attachments[$key];
 			}
 		} elseif ( ! empty( $atts['exclude'] ) ) {
-			error_log( __LINE__ . " :: " . __METHOD__ );
 			$attachments = get_children( array( 'post_parent' => $id, 'exclude' => $atts['exclude'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
 		} else {
-			error_log( __LINE__ . " :: " . __METHOD__ );
 			$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
 		}
 
 		if ( empty( $attachments ) ) {
-			error_log( 'Empty' );
 			return $output;
 		}
 
@@ -205,15 +208,45 @@ class Elastigallery {
 
 	public function padded_posts() {
 		// Padded posts
+
+		$num_posts = elastigallery_get_option( 'num_posts' );
+		if ( 0 >= absint( $num_posts ) ) {
+			return '';
+		}
+
 		$thumb_size = elastigallery_get_option( 'thumbnail_size' );
 		$query      = array(
-			'post_type'     => 'post',
-			'no_found_rows' => true,
-			'post_status'   => 'publish',
+			'post_type'              => 'post',
+			'no_found_rows'          => true,
+			'post_status'            => 'publish',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'posts_per_page'         => $num_posts,
 		);
 		$query      = apply_filters( 'elastigallery_padded_posts_query', $query );
 
-		return '';
+		$padded_posts = new WP_Query( $query );
+
+		$output = '';
+		if ( $padded_posts->have_posts() ) {
+			while( $padded_posts->have_posts() ) {
+				$padded_posts->the_post();
+				if ( ! has_post_thumbnail() ) {
+					continue;
+				}
+				$id = get_the_ID();
+				$image_output  = '<a href="' . get_permalink( $id ) . '">';
+				$image_output .= get_the_post_thumbnail( $id, $thumb_size, array() );
+				$image_output .= '</a>';
+
+				$output .= "<div class='gallery-item'>";
+				$output .= "	<div class='gallery-icon'>$image_output</div>";
+				$output .= "</div>";
+			}
+			wp_reset_postdata();
+		}
+
+		return $output;
 	}
 
 	public function attachment_posts( $attachments = false, $atts = array() ) {
@@ -227,13 +260,10 @@ class Elastigallery {
 		$thumb_size = elastigallery_get_option( 'thumbnail_size' );
 		foreach ( $attachments as $id => $attachment ) {
 			if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
-				error_log( __LINE__ );
 				$image_output = wp_get_attachment_link( $id, $thumb_size, false, false, false );
 			} elseif ( ! empty( $atts['link'] ) && 'none' === $atts['link'] ) {
-				error_log( __LINE__ );
 				$image_output = wp_get_attachment_image( $id, $thumb_size, false );
 			} else {
-				error_log( __LINE__ );
 				$image_output = wp_get_attachment_link( $id, $thumb_size, true, false, false );
 			}
 			$image_meta  = wp_get_attachment_metadata( $id );
@@ -250,6 +280,37 @@ class Elastigallery {
 		}
 
 		return $output;
+	}
+
+	public function gallery_settings() {
+		?><script type="text/html" id="tmpl-enable-elastigallery">
+			<label class="setting">
+				<span><?php _e('Enable elastiGallery', 'elastigallery' ); ?></span>
+				<input type="checkbox" data-setting="elastigallery">
+			</label>
+		</script>
+
+		<script>
+
+			jQuery(document).ready(function(){
+
+				// add your shortcode attribute and its default value to the
+				// gallery settings list; $.extend should work as well...
+				_.extend(wp.media.gallery.defaults, {
+					elastigallery: false
+				});
+
+				// merge default gallery settings template with yours
+				wp.media.view.Settings.Gallery = wp.media.view.Settings.Gallery.extend({
+					template: function(view){
+						return wp.media.template('gallery-settings')(view)
+							+ wp.media.template('enable-elastigallery')(view);
+					}
+				});
+
+			});
+
+		</script><?
 	}
 
 	/**
