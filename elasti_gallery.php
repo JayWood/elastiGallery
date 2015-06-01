@@ -216,6 +216,7 @@ class Elastigallery {
 
 		$output = '';
 		$thumb_size = $atts['size'];
+		$counter = 0;
 		foreach ( $attachments as $id => $attachment ) {
 
 			if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
@@ -226,9 +227,11 @@ class Elastigallery {
 				$image_output = wp_get_attachment_link( $id, $thumb_size, true, false, false );
 			}
 
-			$output .= "<div class='entry-attachment attachment-$id'>";
+			$hidden = 0 !== $counter ? "style='display:none'" : '';
+			$output .= "<div class='entry-attachment attachment-$id' $hidden>";
 			$output .= "	<div class='attachment'>$image_output</div>";
 			$output .= "</div>";
+			$counter++;
 		}
 
 		return $output;
@@ -320,6 +323,10 @@ class Elastigallery {
 		return $output;
 	}
 
+	/**
+	 * Adds a settings checkbox to allow users use of
+	 * elastigallery layouts instead of defaults.
+	 */
 	public function gallery_settings() {
 		?><script type="text/html" id="tmpl-enable-elastigallery">
 			<label class="setting">
