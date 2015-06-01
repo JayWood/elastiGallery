@@ -121,9 +121,8 @@ class Elastigallery {
 	 * wheel? Right!?
 	 *
 	 * @param string $output HTML output
-	 * @params array $attr Short code attributes.
-	 *
-	 * @param string $output
+	 * @param array $attr Short code attributes.
+	 * @return string  HTML Gallery content
 	 */
 	public function gallery_filter( $output = '', $attr = array() ) {
 
@@ -240,7 +239,7 @@ class Elastigallery {
 		return $output;
 	}
 
-	public function attachment_posts( $attachments = false, $atts = array() ) {
+	public function attachment_posts( $attachments = array(), $atts = array() ) {
 		// Attachment posts
 
 		if ( empty( $attachments ) || ! is_array( $attachments ) ) {
@@ -307,13 +306,14 @@ class Elastigallery {
 	 * @since  0.1.0
 	 *
 	 * @param  string $filename Name of the file to be included
+	 * @return null     Will include a file if it exists, null otherwise
 	 */
 	public static function include_file( $filename ) {
 		$file = self::dir( 'includes/' . $filename . '.php' );
 		if ( file_exists( $file ) ) {
 			return include_once( $file );
 		}
-
+		return false;
 	}
 
 	/**
