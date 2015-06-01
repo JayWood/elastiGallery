@@ -193,7 +193,37 @@ class Elastigallery {
 
 		$output .= "</div>";
 
+		if ( ! empty( $atts['link'] ) ) {
+			$output .= $this->images( $attachments, $atts );
+		}
+
 		return apply_filters( 'elastigallery_render', $output, $attachments, $atts );
+	}
+
+	public function images( $attachments = array(), $atts = array() ) {
+
+		if ( empty( $attachments ) || ! is_array( $attachments ) || is_feed() ) {
+			return false;
+		}
+
+		$output = '';
+		$thumb_size = $atts['size'];
+		foreach ( $attachments as $id => $attachment ) {
+
+			if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
+				$image_output = wp_get_attachment_link( $id, $thumb_size, false, false, false );
+			} elseif ( ! empty( $atts['link'] ) && 'none' === $atts['link'] ) {
+				$image_output = wp_get_attachment_image( $id, $thumb_size, false );
+			} else {
+				$image_output = wp_get_attachment_link( $id, $thumb_size, true, false, false );
+			}
+
+			$output .= "<div class='entry-attachment attachment-$id'>";
+			$output .= "	<div class='attachment'>$image_output</div>";
+			$output .= "</div>";
+		}
+
+		return $output;
 	}
 
 	public function padded_posts() {
@@ -229,7 +259,7 @@ class Elastigallery {
 				$image_output .= get_the_post_thumbnail( $id, $thumb_size, array() );
 				$image_output .= '</a>';
 
-				$output .= "<div class='gallery-item'>";
+				$output .= "<div class='gallery-item post-$id'>";
 				$output .= "	<div class='gallery-icon'>$image_output</div>";
 				$output .= "</div>";
 			}
@@ -261,11 +291,8 @@ class Elastigallery {
 			if ( isset( $image_meta['height'], $image_meta['width'] ) ) {
 				$orientation = ( $image_meta['height'] > $image_meta['width'] ) ? 'portrait' : 'landscape';
 			}
-			$output .= "<div class='gallery-item'>";
-			$output .= "
-			<div class='gallery-icon {$orientation}'>
-				$image_output
-			</div>";
+			$output .= "<div class='gallery-item attachment-$id'>";
+			$output .= "<div class='gallery-icon {$orientation}'>$image_output</div>";
 			$output .= "</div>";
 		}
 
