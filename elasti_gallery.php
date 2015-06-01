@@ -149,10 +149,6 @@ class Elastigallery {
 			'order'      => 'ASC',
 			'orderby'    => 'menu_order ID',
 			'id'         => $post ? $post->ID : 0,
-//			'itemtag'    => $html5 ? 'figure'     : 'dl',
-//			'icontag'    => $html5 ? 'div'        : 'dt',
-//			'captiontag' => $html5 ? 'figcaption' : 'dd',
-//			'columns'    => 3,
 			'size'       => 'thumbnail',
 			'include'    => '',
 			'exclude'    => '',
@@ -289,8 +285,6 @@ class Elastigallery {
 
 			jQuery(document).ready(function(){
 
-				// add your shortcode attribute and its default value to the
-				// gallery settings list; $.extend should work as well...
 				_.extend(wp.media.gallery.defaults, {
 					elastigallery: false
 				});
