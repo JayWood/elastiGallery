@@ -16,8 +16,12 @@ window.Elastigallery = (function(window, document, $, undefined){
 
 	app.init = function() {
         $( '.elastigallery' ).owlCarousel({
-            items: 4,
-            navigation: false,
+            items:             5,
+            itemsDesktop:      [ 1199, 5 ],
+            itemsDesktopSmall: [ 979, 3 ],
+            itemsTablet:       [ 768, 5 ],
+            itemsMobile:       [ 479, 3 ],
+            navigation:        false,
         });
 	};
 

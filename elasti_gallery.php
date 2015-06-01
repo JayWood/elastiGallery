@@ -194,13 +194,21 @@ class Elastigallery {
 		$output .= "</div>";
 
 		if ( ! empty( $atts['link'] ) ) {
-			$output .= $this->images( $attachments, $atts );
+			$output .= $this->image_display( $attachments, $atts );
 		}
 
 		return apply_filters( 'elastigallery_render', $output, $attachments, $atts );
 	}
 
-	public function images( $attachments = array(), $atts = array() ) {
+	/**
+	 * Images display blocks
+	 *
+	 * @param array $attachments
+	 * @param array $atts
+	 *
+	 * @return bool|string
+	 */
+	public function image_display( $attachments = array(), $atts = array() ) {
 
 		if ( empty( $attachments ) || ! is_array( $attachments ) || is_feed() ) {
 			return false;
@@ -226,6 +234,11 @@ class Elastigallery {
 		return $output;
 	}
 
+	/**
+	 * Gets the post additions to add onto image slides
+	 *
+	 * @return string
+	 */
 	public function padded_posts() {
 		// Padded posts
 
@@ -269,6 +282,14 @@ class Elastigallery {
 		return $output;
 	}
 
+	/**
+	 * Helper function to handle the acquisition of attachments
+	 *
+	 * @param array $attachments
+	 * @param array $atts
+	 *
+	 * @return bool|string
+	 */
 	public function attachment_posts( $attachments = array(), $atts = array() ) {
 		// Attachment posts
 
