@@ -228,13 +228,46 @@ class Elastigallery {
 			}
 
 			$hidden = 0 !== $counter ? "style='display:none'" : '';
-			$output .= "<div class='entry-attachment attachment-$id' $hidden>";
+			$element_id = $this->get_url_title( $id );
+
+			$output .= "<div class='entry-attachment attachment-$id' $hidden id='$element_id'>";
 			$output .= "	<div class='attachment'>$image_output</div>";
 			$output .= "</div>";
 			$counter++;
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Helper method to get a URL Friendly post title
+	 * @param int $attachment_id
+	 *
+	 * @return bool|string
+	 */
+	private function get_url_title( $attachment_id = 0 ) {
+		if ( empty( $attachment_id ) ) {
+			return false;
+		}
+
+		$permalink = get_permalink( $attachment_id );
+		return basename( parse_url( $permalink, PHP_URL_PATH ) );
+	}
+
+	/**
+	 * Creates an anchorable link
+	 *
+	 * @param int $attachment_id
+	 * @param string $html
+	 *
+	 * @return string
+	 */
+	public function slides_img_link( $attachment_id = 0, $html = '' ) {
+		if ( empty( $html ) || empty( $attachment_id ) ) {
+			return $html;
+		}
+
+		return sprintf( '<a href="#%s">%s</a>', $this->get_url_title( $attachment_id ), $html );
 	}
 
 	/**
@@ -306,7 +339,7 @@ class Elastigallery {
 			if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
 				$image_output = wp_get_attachment_link( $id, $thumb_size, false, false, false );
 			} elseif ( ! empty( $atts['link'] ) && 'none' === $atts['link'] ) {
-				$image_output = wp_get_attachment_image( $id, $thumb_size, false );
+				$image_output = $this->slides_img_link( $id, wp_get_attachment_image( $id, $thumb_size, false ) );
 			} else {
 				$image_output = wp_get_attachment_link( $id, $thumb_size, true, false, false );
 			}
