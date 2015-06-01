@@ -159,10 +159,6 @@ class Elastigallery {
 			'link'       => ''
 		), $attr, 'gallery' );
 
-		$before_after = elastigallery_get_option( 'pos' );
-
-
-
 		if ( ! empty( $atts['include'] ) ) {
 			$_attachments = get_posts( array( 'include' => $atts['include'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
 			$attachments = array();
@@ -187,10 +183,9 @@ class Elastigallery {
 			return $output;
 		}
 
-		$selector = "elastigallery-$instance";
-
-		$output = "<div id='$selector' class='elastigallery galleryid-{$id}' style='display: none;'>";
-
+		$selector     = "elastigallery-$instance";
+		$output       = "<div id='$selector' class='elastigallery galleryid-{$id}' style='display: none;'>";
+		$before_after = elastigallery_get_option( 'pos' );
 		if ( 'before' === $before_after ) {
 			$output .= $this->padded_posts();
 		}
