@@ -15,15 +15,35 @@ window.Elastigallery = (function(window, document, $, undefined){
 	var app = {};
 
 	app.init = function() {
-        $( '.elastigallery' ).owlCarousel({
+        
+        app.current_url =  app.urlObject( { 'url': window.location } );
+        app.owl_settings = {
             items:             5,
             itemsDesktop:      [ 1199, 5 ],
             itemsDesktopSmall: [ 979, 3 ],
             itemsTablet:       [ 768, 5 ],
             itemsMobile:       [ 479, 3 ],
             navigation:        false,
-        });
+        };
+
+        //if ( window.console ) {
+        //    window.console.log( url_object );
+        //}
+
+        $( '.elastigallery' ).each( app.initialize_oc );
+        
+        //$( '.elastigallery' ).owlCarousel();
 	};
+
+    app.initialize_oc = function(){
+        var $that = $(this),
+            carousel = $that.owlCarousel( app.owl_settings );
+
+        if ( app.current_url && app.current_url.hash ) {
+            var $element = $that.find( '#' + app.current_url.hash ); // try and find the element.
+            // @TODO: for each $element use .index() I believe to get it's index then oc.jumpTo on system load.
+        }
+    };
 
     app.urlObject = function ( options ) {
 
