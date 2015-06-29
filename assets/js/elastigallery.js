@@ -1,5 +1,5 @@
 /**
- * ElastiGallery - v0.1.0 - 2015-06-09
+ * ElastiGallery - v0.1.0 - 2015-06-28
  * http://plugish.com
  *
  * Copyright (c) 2015;
@@ -11,7 +11,8 @@
 window.Elastigallery = (function(window, document, $, undefined){
 	'use strict';
 
-	var app = {};
+	var app = {},
+        elg_localized = window.elg_localized || {};
 
 	app.init = function() {
         
@@ -25,25 +26,45 @@ window.Elastigallery = (function(window, document, $, undefined){
             navigation:        false,
         };
 
-        //if ( window.console ) {
-        //    window.console.log( url_object );
-        //}
-
-        $( '.elastigallery' ).each( app.initialize_oc );
-        
-        //$( '.elastigallery' ).owlCarousel();
+        $( '.elastigallery_wrapper' ).each( app.initialize_oc );
 	};
 
     app.initialize_oc = function(){
-        var $that = $(this),
-            carousel = $that.owlCarousel( app.owl_settings );
+        var $that = $( this ),
+            carousel = $that.find( '.elastigallery_slides' ).owlCarousel( app.owl_settings );
 
         if ( app.current_url && app.current_url.hash ) {
-            var $element = $that.find( '#' + app.current_url.hash ); // try and find the element.
-            // @TODO: for each $element use .index() I believe to get it's index then oc.jumpTo on system load.
+            var hash = '#elastigallery-' + app.current_url.hash,
+                $item = $that.find( hash ).parent( '.gallery-item' ),
+                $index = $that.find( '.gallery-item' ).index( $item );
+
+            if ( $index ) {
+                carousel.trigger( 'owl.jumpTo', $index );
+            }
         }
     };
 
+    app.log = function( data ){
+
+        if ( window.console && elg_localized.script_debug ) {
+            window.console.log( data );
+        }
+    };
+
+    /**
+     * JS utility function that:
+     * - Breaks down url to an object with accessible properties: protocol, parameters object, host, hash, etc...
+     * - Converts url parameters to key/value pairs
+     * - Convert parameter numeric values to their base types instead of strings
+     * - Store multiple values of a parameter in an array
+     * - Unescape parameter values
+     *
+     * @author: Aymanfarhat
+     * @link: https://gist.github.com/aymanfarhat/5608517
+     *
+     * @param options
+     * @returns object Similar to PHP's parse_url() method
+     */
     app.urlObject = function ( options ) {
 
         var url_search_arr,

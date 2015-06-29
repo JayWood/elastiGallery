@@ -111,6 +111,9 @@ class Elastigallery {
 	public function setup_scripts() {
 		wp_enqueue_style( 'elastigallery' );
 		wp_enqueue_script( 'elastigallery_js' );
+		wp_localize_script( 'elastigallery_js', 'elg_localized', array(
+			'script_debug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? true : false,
+		) );
 	}
 
 	/**
@@ -178,9 +181,11 @@ class Elastigallery {
 			return $output;
 		}
 
-		$selector     = "elastigallery-$instance";
-		$output       = "<div id='$selector' class='elastigallery galleryid-{$id}' style='display: none;'>";
 		$before_after = elastigallery_get_option( 'pos' );
+
+		$output       = "<div id='elastigallery-$instance' class='elastigallery_wrapper'>";
+		$output      .= "<div class='elastigallery_slides galleryid-{$id}' style='display: none;'>";
+
 		if ( 'before' === $before_after ) {
 			$output .= $this->padded_posts();
 		}
@@ -196,6 +201,8 @@ class Elastigallery {
 		if ( ! empty( $atts['link'] ) ) {
 			$output .= $this->image_display( $attachments, $atts );
 		}
+
+		$output .= '</div>';
 
 		return apply_filters( 'elastigallery_render', $output, $attachments, $atts );
 	}
@@ -348,8 +355,11 @@ class Elastigallery {
 			if ( isset( $image_meta['height'], $image_meta['width'] ) ) {
 				$orientation = ( $image_meta['height'] > $image_meta['width'] ) ? 'portrait' : 'landscape';
 			}
+
+			$element_id = $this->get_url_title( $id );
+			$id_attr = ! empty( $element_id ) ? 'id="elastigallery-' . $element_id . '"' : false;
 			$output .= "<div class='gallery-item attachment-$id'>";
-			$output .= "<div class='gallery-icon {$orientation}'>$image_output</div>";
+			$output .= "<div class='gallery-icon {$orientation}' $id_attr>$image_output</div>";
 			$output .= "</div>";
 		}
 
