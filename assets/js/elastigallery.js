@@ -23,7 +23,7 @@ window.Elastigallery = (function(window, document, $, undefined){
             itemsDesktopSmall: [ 979, 3 ],
             itemsTablet:       [ 768, 5 ],
             itemsMobile:       [ 479, 3 ],
-            navigation:        false,
+            navigation:        false
         };
 
         $( '.elastigallery_wrapper' ).each( app.initialize_oc );
@@ -74,7 +74,7 @@ window.Elastigallery = (function(window, document, $, undefined){
     };
 
     /**
-     * JS utility function that:
+     * JS utility function
      * - Breaks down url to an object with accessible properties: protocol, parameters object, host, hash, etc...
      * - Converts url parameters to key/value pairs
      * - Convert parameter numeric values to their base types instead of strings
