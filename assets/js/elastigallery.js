@@ -1,5 +1,5 @@
 /**
- * ElastiGallery - v0.1.0 - 2015-06-28
+ * ElastiGallery - v0.1.0 - 2015-07-04
  * http://plugish.com
  *
  * Copyright (c) 2015;
@@ -27,6 +27,7 @@ window.Elastigallery = (function(window, document, $, undefined){
         };
 
         $( '.elastigallery_wrapper' ).each( app.initialize_oc );
+        $( 'body' ).on( 'click', 'a.elastigallery-slide', app.show_image );
 	};
 
     app.initialize_oc = function(){
@@ -36,16 +37,37 @@ window.Elastigallery = (function(window, document, $, undefined){
         if ( app.current_url && app.current_url.hash ) {
             var hash = '#elastigallery-' + app.current_url.hash,
                 $item = $that.find( hash ).parent( '.gallery-item' ),
-                $index = $that.find( '.gallery-item' ).index( $item );
+                $index = $that.find( '.gallery-item' ).index( $item ),
+                $image_divs = $that.find( '.entry-attachment' );
 
             if ( $index ) {
                 carousel.trigger( 'owl.jumpTo', $index );
+                $image_divs.each( function(){
+                    var $el = $( this );
+                    if ( app.current_url.hash === $el.attr('id') ) {
+                        $el.show();
+                    } else {
+                        $el.hide();
+                    }
+                });
             }
         }
     };
 
-    app.log = function( data ){
+    app.show_image = function( evt ) {
+        evt.preventDefault();
+        var $that = $( this ),
+            $to_show = $( $that.attr( 'href' ) ),
+            $container = $to_show.parent( '.elastigallery_wrapper' );
 
+        $container.find( '.entry-attachment' ).hide();
+        $to_show.show();
+
+        // Use this to prevent jumping to the image, but still allow url hash changes
+        history.replaceState( null, '', $that.attr('href') );
+    };
+
+    app.log = function( data ){
         if ( window.console && elg_localized.script_debug ) {
             window.console.log( data );
         }

@@ -6,8 +6,13 @@
  * Licensed under the GPLv2+ license.
  */
 
-.elastigallery{
-	.gallery-item{
-		// Nothing
+.elastigallery_wrapper{
+	.owl-pagination{
+		.owl-page{
+			&.active{
+				// Default them sets this to red, idk why
+				background-color: transparent;
+			}
+		}
 	}
 }

@@ -274,7 +274,7 @@ class Elastigallery {
 			return $html;
 		}
 
-		return sprintf( '<a href="#%s">%s</a>', $this->get_url_title( $attachment_id ), $html );
+		return sprintf( '<a href="#%s" class="elastigallery-slide">%s</a>', $this->get_url_title( $attachment_id ), $html );
 	}
 
 	/**
