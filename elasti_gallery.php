@@ -285,8 +285,8 @@ class Elastigallery {
 	public function padded_posts() {
 		// Padded posts
 
-		$num_posts = elastigallery_get_option( 'num_posts' );
-		if ( 0 >= absint( $num_posts ) ) {
+		$num_posts = absint( elastigallery_get_option( 'num_posts' ) );
+		if ( 0 >= $num_posts ) {
 			return '';
 		}
 
@@ -298,6 +298,8 @@ class Elastigallery {
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 			'posts_per_page'         => $num_posts,
+			'nopaging'               => true,
+			'ignore_sticky_posts'    => true,
 		);
 		$query      = apply_filters( 'elastigallery_padded_posts_query', $query );
 

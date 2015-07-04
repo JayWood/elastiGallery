@@ -66,7 +66,7 @@ class ElastiGallery_Admin {
 	}
 
 	public function sanitize_number( $null, $new ) {
-		return preg_replace( '/[^0-9/', '', $new );
+		return preg_replace( '/[^0-9]/', '', $new );
 	}
 
 
