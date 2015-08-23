@@ -66,7 +66,7 @@ spl_autoload_register( 'elastigallery_autoload_classes' );
 /**
  * Main initiation class
  */
-class Elastigallery {
+class Elastigallery{
 
 	const VERSION = '0.1.0';
 
@@ -398,7 +398,7 @@ class Elastigallery {
 
 			});
 
-		</script><?
+		</script><?php
 	}
 
 	/**
@@ -414,36 +414,6 @@ class Elastigallery {
 			return include_once( $file );
 		}
 		return false;
-	}
-
-	/**
-	 * This plugin's directory
-	 * @since  0.1.0
-	 *
-	 * @param  string $path (optional) appended path
-	 *
-	 * @return string       Directory and path
-	 */
-	public static function dir( $path = '' ) {
-		static $dir;
-		$dir = $dir ? $dir : trailingslashit( dirname( __FILE__ ) );
-
-		return $dir . $path;
-	}
-
-	/**
-	 * This plugin's url
-	 * @since  0.1.0
-	 *
-	 * @param  string $path (optional) appended path
-	 *
-	 * @return string       URL and path
-	 */
-	public static function url( $path = '' ) {
-		static $url;
-		$url = $url ? $url : trailingslashit( plugin_dir_url( __FILE__ ) );
-
-		return $url . $path;
 	}
 
 	/**
@@ -465,9 +435,41 @@ class Elastigallery {
 		}
 	}
 
+
+	/**
+	 * This plugin's directory
+	 *
+	 * @since  0.1.0
+	 *
+	 * @param  string $path (optional) appended path
+	 *
+	 * @return string       Directory and path
+	 */
+	public static function dir( $path = '' ) {
+		static $dir;
+		$dir = $dir ? $dir : trailingslashit( dirname( __FILE__ ) );
+
+		return $dir . $path;
+	}
+
+	/**
+	 * This plugin's url
+	 *
+	 * @since  0.1.0
+	 *
+	 * @param  string $path (optional) appended path
+	 *
+	 * @return string       URL and path
+	 */
+	public static function url( $path = '' ) {
+		static $url;
+		$url = $url ? $url : trailingslashit( plugin_dir_url( __FILE__ ) );
+
+		return $url . $path;
+	}
+
 }
 
 // init our class
 $GLOBALS['Elastigallery'] = new Elastigallery();
 $GLOBALS['Elastigallery']->hooks();
-
