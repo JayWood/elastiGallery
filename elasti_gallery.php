@@ -133,7 +133,7 @@ class Elastigallery{
 		$attr = shortcode_atts( array(
 			'elastigallery' => false,
 			'ids' => '',
-		), $attr, 'gallery' );
+		), $attr, 'elastigallery' );
 
 		if ( ! isset( $attr['elastigallery'] ) ) {
 			return $output;
