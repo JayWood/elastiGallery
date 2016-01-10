@@ -298,7 +298,7 @@ class Elastigallery{
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 			'posts_per_page'         => $num_posts,
-			'nopaging'               => true,
+//			'nopaging'               => true,
 			'ignore_sticky_posts'    => true,
 		);
 		$query      = apply_filters( 'elastigallery_padded_posts_query', $query );
