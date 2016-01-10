@@ -130,6 +130,11 @@ class Elastigallery{
 	public function gallery_filter( $output = '', $attr = array() ) {
 
 		// Prevent non-elastigallery overrides
+		$attr = shortcode_atts( array(
+			'elastigallery' => false,
+			'ids' => '',
+		), $attr, 'gallery' );
+
 		if ( ! isset( $attr['elastigallery'] ) ) {
 			return $output;
 		}
