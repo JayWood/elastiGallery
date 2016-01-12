@@ -105,15 +105,23 @@ class Elastigallery{
 
 		wp_register_script( 'owlcarousel_js', $this->url( "assets/js/vendor/OwlCarousel/owl.carousel{$min}.js" ), array( 'jquery' ), self::VERSION, true );
 		wp_register_script( 'elastigallery_js', $this->url( "assets/js/elastigallery{$min}.js" ), array( 'owlcarousel_js' ), self::VERSION, true );
-
 	}
 
 	public function setup_scripts() {
+
+		$l10n = array(
+			'script_debug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? true : false,
+		);
+
+		$owl_overrides = apply_filters( 'eg_owl_overrides', array() );
+
+		if ( ! empty( $owl_overrides ) ) {
+			$l10n['owl_settings'] = $owl_overrides;
+		}
+
 		wp_enqueue_style( 'elastigallery' );
 		wp_enqueue_script( 'elastigallery_js' );
-		wp_localize_script( 'elastigallery_js', 'elg_localized', array(
-			'script_debug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? true : false,
-		) );
+		wp_localize_script( 'elastigallery_js', 'elg_localized', $l10n );
 	}
 
 	/**

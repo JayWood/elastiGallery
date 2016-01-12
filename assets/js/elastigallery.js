@@ -1,8 +1,8 @@
 /**
- * ElastiGallery - v0.1.0 - 2015-07-04
+ * ElastiGallery - v0.1.0 - 2016-01-11
  * http://plugish.com
  *
- * Copyright (c) 2015;
+ * Copyright (c) 2016;
  * Licensed GPLv2+
  */
 /*jslint browser: true */
