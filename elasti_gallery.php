@@ -70,13 +70,23 @@ class Elastigallery{
 
 	const VERSION = '0.1.0';
 
+	public static $instance = null;
+
 	/**
 	 * Sets up our plugin
 	 * @since  0.1.0
 	 */
-	public function __construct() {
+	protected function __construct() {
 		// Similar to default thumbnail, but with cropping.
 		add_image_size( 'elsatigallery-thumbnail', 150, 150, array( 'top', 'center' ) );
+	}
+
+	public static function get_instance() {
+		if ( null == self::$instance ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
 	}
 
 	public function hooks() {
@@ -483,6 +493,11 @@ class Elastigallery{
 
 }
 
-// init our class
-$GLOBALS['Elastigallery'] = new Elastigallery();
-$GLOBALS['Elastigallery']->hooks();
+/**
+ * @return Elastigallery
+ */
+function elasti_gallery() {
+	return Elastigallery::get_instance();
+}
+
+add_action( 'plugins_loaded', array( elasti_gallery(), 'hooks' ) );
