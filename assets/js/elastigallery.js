@@ -19,9 +19,18 @@ window.Elastigallery = (function(window, document, $, undefined){
         app.current_url =  app.urlObject( { 'url': window.location } );
         app.owl_settings = elg_localized.owl_settings;
 
+        app.owl_settings.afterInit = app.afterGalleryInit;
+
         $( '.elastigallery_wrapper' ).each( app.initialize_oc );
         $( 'body' ).on( 'click', 'a.elastigallery-slide', app.show_image );
 	};
+
+    // Force the gallery to jump to the current item.
+    app.afterGalleryInit = function() {
+        if( app.owl_settings.currentItem ) {
+            this.jumpTo( app.owl_settings.currentItem );
+        }
+    };
 
     app.initialize_oc = function(){
         var $that = $( this ),
