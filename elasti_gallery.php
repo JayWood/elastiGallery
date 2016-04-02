@@ -123,7 +123,16 @@ class Elastigallery{
 			'script_debug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? true : false,
 		);
 
-		$owl_overrides = apply_filters( 'eg_owl_overrides', array() );
+		$defaults = array(
+			'items'             => 5,
+			'itemsDesktop'      => array( 1199, 5 ),
+			'itemsDesktopSmall' => array( 979, 3 ),
+			'itemsTablet'       => array( 768, 5 ),
+			'itemsMobile'       => array( 479, 3 ),
+			'navigation'        => false,
+		);
+
+		$owl_overrides = apply_filters( 'eg_owl_overrides', $defaults );
 
 		if ( ! empty( $owl_overrides ) ) {
 			$l10n['owl_settings'] = $owl_overrides;

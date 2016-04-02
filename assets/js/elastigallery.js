@@ -1,5 +1,5 @@
 /**
- * ElastiGallery - v0.1.0 - 2016-01-11
+ * ElastiGallery - v0.1.0 - 2016-04-02
  * http://plugish.com
  *
  * Copyright (c) 2016;
