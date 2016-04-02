@@ -17,14 +17,7 @@ window.Elastigallery = (function(window, document, $, undefined){
 	app.init = function() {
         
         app.current_url =  app.urlObject( { 'url': window.location } );
-        app.owl_settings = {
-            items:             5,
-            itemsDesktop:      [ 1199, 5 ],
-            itemsDesktopSmall: [ 979, 3 ],
-            itemsTablet:       [ 768, 5 ],
-            itemsMobile:       [ 479, 3 ],
-            navigation:        false
-        };
+        app.owl_settings = elg_localized.owl_settings;
 
         $( '.elastigallery_wrapper' ).each( app.initialize_oc );
         $( 'body' ).on( 'click', 'a.elastigallery-slide', app.show_image );
