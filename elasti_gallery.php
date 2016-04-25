@@ -323,7 +323,7 @@ class Elastigallery{
 		}
 
 		$thumb_size = elastigallery_get_option( 'thumbnail_size' );
-		$query      = array(
+		$query_args      = array(
 			'post_type'              => 'post',
 			'no_found_rows'          => true,
 			'post_status'            => 'publish',
@@ -333,9 +333,9 @@ class Elastigallery{
 //			'nopaging'               => true,
 			'ignore_sticky_posts'    => true,
 		);
-		$query      = apply_filters( 'elastigallery_padded_posts_query', $query );
+		$query_args      = apply_filters( 'elastigallery_padded_posts_query', $query_args );
 
-		$padded_posts = new WP_Query( $query );
+		$padded_posts = new WP_Query( $query_args );
 
 		$output = '';
 		if ( $padded_posts->have_posts() ) {
