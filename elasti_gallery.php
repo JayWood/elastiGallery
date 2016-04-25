@@ -166,8 +166,8 @@ class Elastigallery{
 			return $output;
 		}
 
-		$post = get_post();
-		$id = isset( $post->ID ) ? $post->ID : 0;
+		$cur_post = get_post();
+		$id = isset( $cur_post->ID ) ? $cur_post->ID : 0;
 
 		static $instance = 0;
 		$instance++;
@@ -182,7 +182,7 @@ class Elastigallery{
 		$atts = shortcode_atts( array(
 			'order'      => 'ASC',
 			'orderby'    => 'menu_order ID',
-			'id'         => $post ? $post->ID : 0,
+			'id'         => $cur_post ? $cur_post->ID : 0,
 			'size'       => 'thumbnail',
 			'include'    => '',
 			'exclude'    => '',
