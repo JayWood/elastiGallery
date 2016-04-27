@@ -109,8 +109,8 @@ class Elastigallery{
 		load_textdomain( 'elastigallery', WP_LANG_DIR . '/elastigallery/elastigallery-' . $locale . '.mo' );
 		load_plugin_textdomain( 'elastigallery', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
-		wp_register_style( 'owlcarousel', $this->url( "assets/js/vendor/OwlCarousel/owl.carousel.css" ), false, self::VERSION );
-		wp_register_style( 'owlcarousel_theme', $this->url( "assets/js/vendor/OwlCarousel/owl.theme.css" ), array( 'owlcarousel' ), self::VERSION );
+		wp_register_style( 'owlcarousel', $this->url( 'assets/js/vendor/OwlCarousel/owl.carousel.css' ), false, self::VERSION );
+		wp_register_style( 'owlcarousel_theme', $this->url( 'assets/js/vendor/OwlCarousel/owl.theme.css' ), array( 'owlcarousel' ), self::VERSION );
 		wp_register_style( 'elastigallery', $this->url( "assets/css/elastigallery{$min}.css" ), array( 'owlcarousel_theme' ), self::VERSION );
 
 		wp_register_script( 'owlcarousel_js', $this->url( "assets/js/vendor/OwlCarousel/owl.carousel{$min}.js" ), array( 'jquery' ), self::VERSION, true );
@@ -189,52 +189,84 @@ class Elastigallery{
 			'link'       => ''
 		), $attr, 'gallery' );
 
-		if ( ! empty( $atts['include'] ) ) {
-			$_attachments = get_posts( array( 'include' => $atts['include'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
-			$attachments = array();
-			foreach ( $_attachments as $key => $val ) {
-				$attachments[$val->ID] = $_attachments[$key];
+		$cache_key = md5( serialize( $atts ) );
+		if ( false === $output = wp_cache_get( $cache_key, 'elasti_gallery' ) ) {
+
+			if ( ! empty( $atts['include'] ) ) {
+				$_attachments = get_posts( array( 'include'        => $atts['include'],
+				                                  'post_status'    => 'inherit',
+				                                  'post_type'      => 'attachment',
+				                                  'post_mime_type' => 'image',
+				                                  'order'          => $atts['order'],
+				                                  'orderby'        => $atts['orderby']
+				) );
+				$attachments  = array();
+				foreach ( $_attachments as $key => $val ) {
+					$attachments[ $val->ID ] = $_attachments[ $key ];
+				}
+			} elseif ( ! empty( $atts['exclude'] ) ) {
+				$attachments = get_children(
+					array(
+						'post_parent'    => $id,
+						'exclude'        => $atts['exclude'],
+						'post_status'    => 'inherit',
+						'post_type'      => 'attachment',
+						'post_mime_type' => 'image',
+						'order'          => $atts['order'],
+						'orderby'        => $atts['orderby'],
+					)
+				);
+			} else {
+				$attachments = get_children(
+					array(
+						'post_parent'    => $id,
+						'post_status'    => 'inherit',
+						'post_type'      => 'attachment',
+						'post_mime_type' => 'image',
+						'order'          => $atts['order'],
+						'orderby'        => $atts['orderby'],
+					)
+				);
 			}
-		} elseif ( ! empty( $atts['exclude'] ) ) {
-			$attachments = get_children( array( 'post_parent' => $id, 'exclude' => $atts['exclude'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
-		} else {
-			$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
-		}
 
-		if ( empty( $attachments ) ) {
-			return $output;
-		}
-
-		if ( is_feed() ) {
-			$output = "\n";
-			foreach ( $attachments as $att_id => $attachment ) {
-				$output .= wp_get_attachment_link( $att_id, $atts['size'], true ) . "\n";
+			if ( empty( $attachments ) ) {
+				return $output;
 			}
-			return $output;
+
+			if ( is_feed() ) {
+				$output = "\n";
+				foreach ( $attachments as $att_id => $attachment ) {
+					$output .= wp_get_attachment_link( $att_id, $atts['size'], true ) . "\n";
+				}
+
+				return $output;
+			}
+
+			$before_after = elastigallery_get_option( 'pos' );
+
+			$output = "<div id='elastigallery-$instance' class='elastigallery_wrapper'>";
+			$output .= "<div class='elastigallery_slides galleryid-{$id}' style='display: none;'>";
+
+			if ( 'before' === $before_after ) {
+				$output .= $this->padded_posts();
+			}
+
+			$output .= $this->attachment_posts( $attachments, $atts );
+
+			if ( 'before' !== $before_after ) {
+				$output .= $this->padded_posts();
+			}
+
+			$output .= '</div>';
+
+			if ( ! empty( $atts['link'] ) ) {
+				$output .= $this->image_display( $attachments, $atts );
+			}
+
+			$output .= '</div>';
+
+			wp_cache_set( $cache_key, $output, 'elasti_gallery' );
 		}
-
-		$before_after = elastigallery_get_option( 'pos' );
-
-		$output       = "<div id='elastigallery-$instance' class='elastigallery_wrapper'>";
-		$output      .= "<div class='elastigallery_slides galleryid-{$id}' style='display: none;'>";
-
-		if ( 'before' === $before_after ) {
-			$output .= $this->padded_posts();
-		}
-
-		$output .= $this->attachment_posts( $attachments, $atts );
-
-		if ( 'before' !== $before_after ) {
-			$output .= $this->padded_posts();
-		}
-
-		$output .= "</div>";
-
-		if ( ! empty( $atts['link'] ) ) {
-			$output .= $this->image_display( $attachments, $atts );
-		}
-
-		$output .= '</div>';
 
 		return apply_filters( 'elastigallery_render', $output, $attachments, $atts );
 	}
