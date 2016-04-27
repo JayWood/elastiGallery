@@ -189,17 +189,21 @@ class Elastigallery{
 			'link'       => ''
 		), $attr, 'gallery' );
 
-		$cache_key = md5( serialize( $atts ) );
+		$feed = is_feed() ? 'feed_' : false;
+		$cache_key = md5( $feed . serialize( $atts ) );
 		if ( false === $output = wp_cache_get( $cache_key, 'elasti_gallery' ) ) {
 
 			if ( ! empty( $atts['include'] ) ) {
-				$_attachments = get_posts( array( 'include'        => $atts['include'],
-				                                  'post_status'    => 'inherit',
-				                                  'post_type'      => 'attachment',
-				                                  'post_mime_type' => 'image',
-				                                  'order'          => $atts['order'],
-				                                  'orderby'        => $atts['orderby']
-				) );
+				$_attachments = get_posts(
+					array(
+						'include'        => $atts['include'],
+						'post_status'    => 'inherit',
+						'post_type'      => 'attachment',
+						'post_mime_type' => 'image',
+						'order'          => $atts['order'],
+						'orderby'        => $atts['orderby'],
+					)
+				);
 				$attachments  = array();
 				foreach ( $_attachments as $key => $val ) {
 					$attachments[ $val->ID ] = $_attachments[ $key ];
@@ -238,6 +242,7 @@ class Elastigallery{
 				foreach ( $attachments as $att_id => $attachment ) {
 					$output .= wp_get_attachment_link( $att_id, $atts['size'], true ) . "\n";
 				}
+				wp_cache_set( $cache_key, $output, 'elasti_gallery' );
 
 				return $output;
 			}
